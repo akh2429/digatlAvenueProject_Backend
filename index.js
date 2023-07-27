@@ -42,7 +42,7 @@ app.post('/tasks', async (req, res) => {
     try {
         const { month } = req.body;
         const data = await fs.readJson(dataFilePath);
-        const response = { [month]: data[month] }
+        const response = data[month]
         res.status(200).json(response);
     } catch (err) {
         res.status(500).json({ error: 'Failed to read data' });
