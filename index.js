@@ -11,14 +11,15 @@ function generateInitialData() {
     const data = {};
 
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     months.forEach(month => {
         data[month] = [];
         const daysInMonth = new Date(new Date().getFullYear(), months.indexOf(month) + 1, 0).getDate();
         for (let day = 1; day <= daysInMonth; day++) {
-            data[month].push({ [day]: [] });
+            const dayNumber = new Date(new Date().getFullYear(), months.indexOf(month), day).getDay();
+            data[month].push({ [day]: { dayName: dayNames[dayNumber], tasks: [] } });
         }
     });
-
     return data
 };
 
@@ -52,32 +53,38 @@ app.post("/api/tasks", async (req, res) => {
     try {
         const { month, day, task, id, action } = req.body;
 
-        if (!month || !day || !task, !id) {
+        if
+            (!month || !day || !task, !id) {
             return res.status(400).json({ error: 'Month, day, and task are required' });
         }
 
         const modifiedTask = { taskid: id, task: task, status: "pending" };
         const data = await fs.readJson(dataFilePath);
         const checkIndex = data[month].findIndex((val) => { return day in val });
-        const check = data[month][checkIndex][day].find((val) => val.taskid === id);
+        const dayTasks = data[month][checkIndex][day].tasks;
+        const check = dayTasks.find((val) => val.taskid === id);
 
-        if (!check && action === "addTask") {
-            data[month][checkIndex][day].push(modifiedTask);
+        if
+            (!check && action === "addTask") {
+            dayTasks.push(modifiedTask);
             await fs.writeJson(dataFilePath, data);
             res.status(201).json("File saved");
         }
-        else if (check && action === "deleteTask") {
-            const delteIndex = data[month][checkIndex][day].findIndex((val) => val.taskid === id);
-            data[month][checkIndex][day].splice(delteIndex, 1);
+        else if
+            (check && action === "deleteTask") {
+            const delteIndex = dayTasks.findIndex((val) => val.taskid === id);
+            dayTasks.splice(delteIndex, 1);
             await fs.writeJson(dataFilePath, data);
             res.status(201).json("File deleted");
         }
-        else if (check && action === "markComplete") {
-            const markCompleteIndex = data[month][checkIndex][day].findIndex((val) => val.taskid === id);
-            data[month][checkIndex][day][markCompleteIndex].status = "completed";
+        else if
+            (check && action === "markComplete") {
+            const markCompleteIndex = dayTasks.findIndex((val) => val.taskid === id);
+            dayTasks[markCompleteIndex].status = "completed";
             await fs.writeJson(dataFilePath, data);
             res.status(201).json("markedCompleted");
-        } else {
+        }
+        else {
             res.status(400).json("Task already exist");
         }
     }
