@@ -4,7 +4,8 @@ const path = require('path');
 const app = express();
 const dataFilePath = path.join(__dirname, 'data.json');
 app.use(express.json());
-
+const cors = require('cors');
+app.use(cors());
 
 //InitializeData===========================================================================================================================
 function generateInitialData() {
@@ -37,10 +38,12 @@ async function createJSONfile() {
 createJSONfile();
 
 //getTask===========================================================================================================================
-app.get('/api/tasks', async (req, res) => {
+app.post('/tasks', async (req, res) => {
     try {
+        const { month } = req.body;
         const data = await fs.readJson(dataFilePath);
-        res.status(200).json(data);
+        const response = { [month]: data[month] }
+        res.status(200).json(response);
     } catch (err) {
         res.status(500).json({ error: 'Failed to read data' });
     }
