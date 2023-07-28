@@ -8,6 +8,7 @@ const cors = require('cors');
 app.use(cors());
 
 //InitializeData===========================================================================================================================
+
 function generateInitialData() {
     const data = {};
 
@@ -38,6 +39,7 @@ async function createJSONfile() {
 createJSONfile();
 
 //getTask===========================================================================================================================
+
 app.post('/tasks', async (req, res) => {
     try {
         const { month } = req.body;
